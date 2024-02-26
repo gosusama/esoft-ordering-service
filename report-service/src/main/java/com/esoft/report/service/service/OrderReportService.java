@@ -10,5 +10,7 @@ public interface OrderReportService {
 
     BigDecimal sumAmountByUserId(int uid);
 
+    OrderSummaryReportDTO getOrdersAndRevenueSummaryByUid(int uid);
+
     OrderSummaryReportDTO getOrdersAndRevenueSummary(Integer year, Integer month);
 }

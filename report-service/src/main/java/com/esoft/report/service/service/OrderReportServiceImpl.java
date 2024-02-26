@@ -25,6 +25,11 @@ public class OrderReportServiceImpl implements OrderReportService {
     }
 
     @Override
+    public OrderSummaryReportDTO getOrdersAndRevenueSummaryByUid(int uid) {
+        return orderReportRepository.findCountOrdersAndSumAmountByUid(uid);
+    }
+
+    @Override
     public OrderSummaryReportDTO getOrdersAndRevenueSummary(Integer year, Integer month) {
         return orderReportRepository.findCountOrdersAndSumAmount(year, month);
     }

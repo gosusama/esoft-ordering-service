@@ -94,7 +94,7 @@ public class OrderController {
     }
 
     @DeleteMapping("orders/{id}")
-    public ResponseEntity<ApiResponse<String>> deleteEmployee(@PathVariable int id) throws NoPermissionException {
+    public ResponseEntity<ApiResponse<String>> deleteOrder(@PathVariable int id) throws NoPermissionException {
         Order tempOrder = orderService.findById(id);
 
         // throw exception if null

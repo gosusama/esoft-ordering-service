@@ -56,7 +56,7 @@ public class UserServiceImpl implements UserService {
 
         if (authentication != null) {
             for (GrantedAuthority authority : authentication.getAuthorities()) {
-                if ("ADMIN".equals(authority.getAuthority())) {
+                if ("ROLE_ADMIN".equals(authority.getAuthority())) {
                     return true;
                 }
             }

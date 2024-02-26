@@ -49,12 +49,24 @@ public class OrderServiceTest {
     }
 
     @Test
+    public void findByIdService() {
+        Order order = orderService.findById(2);
+
+        assertEquals("1708867969268_2", order.getCode());
+    }
+
+    @Test
+    public void findByNotExistIdService() {
+        assertNull(orderService.findById(200));
+    }
+
+    @Test
     @Transactional
     public void createOrderService() {
-        assertNull(orderService.findById(1));
-
         User user = userRepository.findByUsername("customer");
         Order order = new Order("LUXURY", 1, "PHOTO_EDITING", new BigDecimal("113.13"));
+        order.setDescription("Resize");
+        order.setNote("Deadline is 2024-02-26");
         order.setCreateUser(user);
 
         Order savedOrder = orderService.save(order);
@@ -64,21 +76,31 @@ public class OrderServiceTest {
         assertEquals(1, savedOrder.getQuantity());
         assertEquals("PHOTO_EDITING", savedOrder.getServiceName());
         assertEquals(new BigDecimal("113.13"), savedOrder.getAmount());
+        assertEquals("Resize", savedOrder.getDescription());
+        assertEquals("Deadline is 2024-02-26", savedOrder.getNote());
     }
 
     @Test
     public void updateOrderService() {
+        assertDoesNotThrow(() -> {
+            orderService.findById(2);
+        });
+
         Order order = orderService.findById(2);
 
         assertEquals("LUXURY", order.getCategory());
         assertEquals(1, order.getQuantity());
         assertEquals("PHOTO_EDITING", order.getServiceName());
         assertEquals(new BigDecimal("150.00"), order.getAmount());
+        assertNull(order.getDescription());
+        assertNull(order.getNote());
 
         order.setCategory("SUPER_LUXURY");
         order.setQuantity(2);
         order.setServiceName("VIDEO_EDITING");
         order.setAmount(new BigDecimal("150.2"));
+        order.setDescription("Resize");
+        order.setNote("Deadline is 2024-02-26");
 
         Order savedOrder = orderService.save(order);
 
@@ -86,6 +108,17 @@ public class OrderServiceTest {
         assertEquals(2, savedOrder.getQuantity());
         assertEquals("VIDEO_EDITING", savedOrder.getServiceName());
         assertEquals(new BigDecimal("150.2"), savedOrder.getAmount());
+        assertEquals("Resize", savedOrder.getDescription());
+        assertEquals("Deadline is 2024-02-26", savedOrder.getNote());
+    }
+
+    @Test
+    public void deleteByIdService() {
+        assertNotNull(orderService.findById(2));
+
+        orderService.deleteById(2);
+
+        assertNull(orderService.findById(2));
     }
 
     @AfterEach

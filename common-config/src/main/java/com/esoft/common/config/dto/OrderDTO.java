@@ -2,6 +2,7 @@ package com.esoft.common.config.dto;
 
 
 import com.esoft.common.config.validation.OrderEnumValidValue;
+import jakarta.validation.constraints.Min;
 
 import java.math.BigDecimal;
 
@@ -13,16 +14,28 @@ public class OrderDTO {
     @OrderEnumValidValue(enumClass = OrderCategory.class, message = "Invalid category")
     private String category;
 
+    @Min(value = 1, message = "quantity must be greater than 0")
     private int quantity;
 
     @OrderEnumValidValue(enumClass = OrderServiceName.class, message = "Invalid service name")
     private String serviceName;
 
+    @Min(value = 1, message = "amount must be greater than 0")
     private BigDecimal amount;
 
     private String description;
 
     private String note;
+
+    public OrderDTO() {
+    }
+
+    public OrderDTO(String category, int quantity, String serviceName, BigDecimal amount) {
+        this.category = category;
+        this.quantity = quantity;
+        this.serviceName = serviceName;
+        this.amount = amount;
+    }
 
     public int getId() {
         return id;

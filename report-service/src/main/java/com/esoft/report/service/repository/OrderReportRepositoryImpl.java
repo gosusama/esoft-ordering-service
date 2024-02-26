@@ -36,6 +36,19 @@ public class OrderReportRepositoryImpl implements OrderReportRepository {
     }
 
     @Override
+    public OrderSummaryReportDTO findCountOrdersAndSumAmountByUid(int uid) {
+        String sql = "SELECT COUNT(*) as totalOrders, SUM(amount) as totalOrderValue " +
+                "FROM Order " +
+                "WHERE createUser.id = :uid";
+
+        TypedQuery<OrderSummaryReportDTO> query = entityManager.createQuery(sql, OrderSummaryReportDTO.class);
+
+        query.setParameter("uid", uid);
+
+        return query.getSingleResult();
+    }
+
+    @Override
     public OrderSummaryReportDTO findCountOrdersAndSumAmount(Integer year, Integer month) {
         String sql = "SELECT COUNT(*) as totalOrders, SUM(amount) as totalOrderValue " +
                 "FROM Order " +

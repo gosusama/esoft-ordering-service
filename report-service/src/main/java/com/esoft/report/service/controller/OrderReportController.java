@@ -33,9 +33,19 @@ public class OrderReportController {
         return ResponseEntity.ok(response);
     }
 
+    @GetMapping("/reports/orders/summary/orders-revenue/users/{uid}")
+    public ResponseEntity<ApiResponse<OrderSummaryReportDTO>> getOrdersAndRevenueSummaryByUid(@PathVariable int uid) {
+        ApiResponse<OrderSummaryReportDTO> response = new ApiResponse<>(
+                "success",
+                orderReportService.getOrdersAndRevenueSummaryByUid(uid)
+        );
+
+        return ResponseEntity.ok(response);
+    }
+
     @GetMapping("/reports/orders/summary/orders-revenue")
     public ResponseEntity<ApiResponse<OrderSummaryReportDTO>> getOrdersAndRevenueSummary(
-            @RequestParam() Integer year,
+            @RequestParam() @Min(2024) Integer year,
             @RequestParam(required = false) @Min(1) @Max(12) Integer month) {
         ApiResponse<OrderSummaryReportDTO> response = new ApiResponse<>(
                 "success",
