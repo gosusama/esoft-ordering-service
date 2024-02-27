@@ -1,0 +1,67 @@
+version: '3.8'
+
+services:
+  # Eureka Server
+  eureka-server:
+    build:
+      context: ./eureka-server
+      args:
+        DOCKER_BUILDKIT: 1
+    ports:
+      - "8761:8761"
+
+  # MySQL Database
+  mysql-db:
+    container_name: eos-mysql-prod
+    image: mysql:latest
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: root
+      MYSQL_USER: springstudent
+      MYSQL_PASSWORD: springstudent
+    ports:
+      - "3307:3306"
+    volumes:
+      - ./Scripts/setup_eos.sql:/docker-entrypoint-initdb.d
+
+  # Order Service
+  order-service:
+    build:
+      context: ./order-service
+      args:
+        DOCKER_BUILDKIT: 1
+    ports:
+      - "8081:8081"
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+    depends_on:
+      - eureka-server
+      - mysql-db
+
+  # Report Service
+  report-service:
+    build:
+      context: ./report-service
+      args:
+        DOCKER_BUILDKIT: 1
+    ports:
+      - "8082:8082"
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+    depends_on:
+      - eureka-server
+      - mysql-db
+
+  # API Gateway
+  api-gateway:
+    build:
+      context: ./api-gateway
+      args:
+        DOCKER_BUILDKIT: 1
+    ports:
+      - "8080:8080"
+    depends_on:
+      - eureka-server
+      - mysql-db
+      - order-service
+      - report-service

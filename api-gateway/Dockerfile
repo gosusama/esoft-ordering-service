@@ -5,11 +5,11 @@ FROM openjdk:17-oracle
 WORKDIR /app
 
 # Copy the JAR file into the container
-COPY ./target/eureka-server-0.0.1-SNAPSHOT.jar ./
+COPY ./target/api-gateway-0.0.1-SNAPSHOT.jar ./
 
 # Expose the port that the application will run on
-EXPOSE 8761
+EXPOSE 8080
 
 # Define the command to run your application
-CMD ["java", "-jar", "eureka-server-0.0.1-SNAPSHOT.jar"]
+CMD ["java", "-jar", "api-gateway-0.0.1-SNAPSHOT.jar"]
 
