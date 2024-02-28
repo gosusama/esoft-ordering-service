@@ -1,5 +1,5 @@
-CREATE DATABASE IF NOT EXISTS `eos`;
-USE `eos`;
+CREATE DATABASE IF NOT EXISTS `eos_prod`;
+USE `eos_prod`;
 
 DROP TABLE IF EXISTS `orders`;
 DROP TABLE IF EXISTS `authorities`;

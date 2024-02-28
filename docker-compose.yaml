@@ -19,13 +19,13 @@ services:
     image: mysql:latest
     environment:
       MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: root
-      MYSQL_USER: springstudent
-      MYSQL_PASSWORD: springstudent
+      MYSQL_DATABASE: eos_prod
+      MYSQL_USER: eos_prod
+      MYSQL_PASSWORD: eos_prod
+    volumes:
+      - "./Scripts/setup-eos.sql:/docker-entrypoint-initdb.d/setup-eos.sql"
     ports:
       - "3307:3306"
-    volumes:
-      - ./Scripts/setup_eos.sql:/docker-entrypoint-initdb.d
     networks:
       - eos_network
 
@@ -39,12 +39,10 @@ services:
       - "8081:8081"
     environment:
       SPRING_PROFILES_ACTIVE: prod
-      # SPRING_DATASOURCE_URL: jdbc:mysql://mysql-db:3306/eos
-      # SPRING_DATASOURCE_USERNAME: springstudent
-      # SPRING_DATASOURCE_PASSWORD: springstudent
     depends_on:
       - eureka-server
       - mysql-db
+    command: ["./wait-for-it.sh", "mysql-db:3306", "--timeout=60", "--", "java", "-jar", "order-service-0.0.1-SNAPSHOT.jar"]
     networks:
       - eos_network
 
@@ -58,12 +56,10 @@ services:
       - "8082:8082"
     environment:
       SPRING_PROFILES_ACTIVE: prod
-      # SPRING_DATASOURCE_URL: jdbc:mysql://mysql-db:3306/eos
-      # SPRING_DATASOURCE_USERNAME: springstudent
-      # SPRING_DATASOURCE_PASSWORD: springstudent
     depends_on:
       - eureka-server
       - mysql-db
+    command: ["./wait-for-it.sh", "mysql-db:3306" , "--timeout=60", "--", "java", "-jar", "report-service-0.0.1-SNAPSHOT.jar"]
     networks:
       - eos_network
 
@@ -82,6 +78,7 @@ services:
       - mysql-db
       - order-service
       - report-service
+    command: ["./wait-for-it.sh", "order-service:8081" , "--timeout=100", "--", "java", "-jar", "api-gateway-0.0.1-SNAPSHOT.jar"]
     networks:
       - eos_network
 networks:

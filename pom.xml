@@ -27,13 +27,21 @@
                 <activeByDefault>true</activeByDefault>
             </activation>
             <properties>
-                <spring.profiles.active>local</spring.profiles.active>
+                <eureka.client.serviceUrl.defaultZone>http://localhost:8761/eureka/
+                </eureka.client.serviceUrl.defaultZone>
+                <spring.datasource.url>jdbc:mysql://localhost:3307/eos</spring.datasource.url>
+                <spring.datasource.username>springstudent</spring.datasource.username>
+                <spring.datasource.username>springstudent</spring.datasource.username>
             </properties>
         </profile>
         <profile>
             <id>prod</id>
             <properties>
-                <spring.profiles.active>prod</spring.profiles.active>
+                <eureka.client.serviceUrl.defaultZone>http://eos-eureka-server-prod:8761/eureka/
+                </eureka.client.serviceUrl.defaultZone>
+                <spring.datasource.url>jdbc:mysql://eos-mysql-prod:3306/eos_prod</spring.datasource.url>
+                <spring.datasource.username>eos_prod</spring.datasource.username>
+                <spring.datasource.password>eos_prod</spring.datasource.password>
             </properties>
         </profile>
     </profiles>
@@ -43,9 +51,6 @@
             <resource>
                 <directory>src/main/resources</directory>
                 <filtering>true</filtering>
-                <includes>
-                    <include>application*.properties</include>
-                </includes>
             </resource>
         </resources>
     </build>
