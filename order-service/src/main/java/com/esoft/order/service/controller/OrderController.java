@@ -39,6 +39,7 @@ public class OrderController {
             throw new RuntimeException("Order id not found - " + id);
         }
 
+        // Just admin or created user can see the order
         if (!userService.isAdmin()) {
             checkPermissionWithOrder(order);
         }
@@ -52,6 +53,8 @@ public class OrderController {
     @GetMapping("/orders/users/{uid}")
     public ResponseEntity<ApiResponse<List<OrderDTO>>> getOrdersByUid(@PathVariable int uid) throws NoPermissionException {
         User currentUser = userService.getCurrentUser();
+
+        // Just admin or created user can see the orders
         if (currentUser.getId() != uid && !userService.isAdmin()) {
             throw new NoPermissionException("User " + currentUser.getUsername() +
                     " does not have permission to perform the operation.");
@@ -83,6 +86,7 @@ public class OrderController {
     public ResponseEntity<ApiResponse<OrderDTO>> updateOrder(@Valid @RequestBody OrderDTO orderDTO) throws NoPermissionException {
         Order order = orderService.findById(orderDTO.getId());
 
+        // Just created user can update the order
         checkPermissionWithOrder(order);
 
         order = orderMapper.updateEntityFromDTO(orderDTO, order);
@@ -102,6 +106,7 @@ public class OrderController {
             throw new RuntimeException("Order id not found - " + id);
         }
 
+        // Just created user can delete the order
         checkPermissionWithOrder(tempOrder);
 
         orderService.deleteById(id);

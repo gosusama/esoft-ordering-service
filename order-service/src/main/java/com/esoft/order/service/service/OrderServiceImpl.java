@@ -50,7 +50,6 @@ public class OrderServiceImpl implements OrderService {
             }
 
             order.setCode(generatedCode);
-
             order.setCreateDate(LocalDateTime.now());
         } else {
             order.setWriteDate(LocalDateTime.now());
