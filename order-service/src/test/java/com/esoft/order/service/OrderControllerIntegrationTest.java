@@ -1,7 +1,8 @@
 package com.esoft.order.service;
 
-import com.esoft.common.config.dto.OrderDTO;
-import com.esoft.common.config.entity.Order;
+import com.esoft.common.config.response.OrderNotFoundException;
+import com.esoft.order.service.dto.OrderDTO;
+import com.esoft.order.service.entity.Order;
 import com.esoft.order.service.service.OrderService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.AfterEach;
@@ -29,7 +30,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @TestPropertySource("/application-test.properties")
 @SpringBootTest
 @AutoConfigureMockMvc
-public class OrderControllerTest {
+public class OrderControllerIntegrationTest {
     @Autowired
     JdbcTemplate jdbc;
 
@@ -105,12 +106,10 @@ public class OrderControllerTest {
         mockMvc.perform(get("/api/orders/users/3")
                         .with(httpBasic("customer", "customer")))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data", hasSize(1)));
-
-        mockMvc.perform(get("/api/orders/users/3")
-                        .with(httpBasic("admin", "admin")))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data", hasSize(1)));
+                .andExpect(jsonPath("$.data.content", hasSize(1)))
+                .andExpect(jsonPath("$.data.totalPages", is(1)))
+                .andExpect(jsonPath("$.data.totalElements", is(1)))
+                .andExpect(jsonPath("$.data.last", is(true)));
     }
 
     @Test
@@ -157,7 +156,10 @@ public class OrderControllerTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message", is("Invalid category")));
 
-        assertNull(orderService.findById(1));
+
+        assertThrows(OrderNotFoundException.class, () -> {
+            orderService.findById(1);
+        });
     }
 
     @Test
@@ -171,7 +173,10 @@ public class OrderControllerTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message", is("quantity must be greater than 0")));
 
-        assertNull(orderService.findById(1));
+
+        assertThrows(OrderNotFoundException.class, () -> {
+            orderService.findById(1);
+        });
     }
 
     @Test
@@ -185,7 +190,10 @@ public class OrderControllerTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message", is("Invalid service name")));
 
-        assertNull(orderService.findById(1));
+
+        assertThrows(OrderNotFoundException.class, () -> {
+            orderService.findById(1);
+        });
     }
 
     @Test
@@ -199,7 +207,10 @@ public class OrderControllerTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message", is("amount must be greater than 0")));
 
-        assertNull(orderService.findById(1));
+
+        assertThrows(OrderNotFoundException.class, () -> {
+            orderService.findById(1);
+        });
     }
 
     @Test
@@ -259,19 +270,26 @@ public class OrderControllerTest {
 
     @Test
     public void deleteOrderHttpRequest() throws Exception {
-        assertNotNull(orderService.findById(3));
+        assertDoesNotThrow(() -> {
+            orderService.findById(3);
+        });
 
         mockMvc.perform(delete("/api/orders/3")
                         .with(httpBasic("customer", "customer")))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.message", is("Delete order id - 3")));
 
-        assertNull(orderService.findById(3));
+
+        assertThrows(OrderNotFoundException.class, () -> {
+            orderService.findById(3);
+        });
     }
 
     @Test
     public void deleteOrderHttpRequestDoesNotExistResponse() throws Exception {
-        assertNull(orderService.findById(1));
+        assertThrows(OrderNotFoundException.class, () -> {
+            orderService.findById(1);
+        });
 
         mockMvc.perform(delete("/api/orders/1")
                         .with(httpBasic("customer", "customer")))

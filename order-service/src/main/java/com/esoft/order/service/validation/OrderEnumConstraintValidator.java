@@ -1,4 +1,4 @@
-package com.esoft.common.config.validation;
+package com.esoft.order.service.validation;
 
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;

@@ -1,12 +1,11 @@
-package com.esoft.common.config.mapper;
+package com.esoft.order.service.mapper;
 
-import com.esoft.common.config.dto.OrderDTO;
-import com.esoft.common.config.entity.Order;
+import com.esoft.order.service.dto.OrderDTO;
+import com.esoft.order.service.entity.Order;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
-
-import java.util.List;
+import org.springframework.data.domain.Page;
 
 @Mapper(componentModel = "spring")
 public interface OrderMapper {
@@ -15,7 +14,7 @@ public interface OrderMapper {
 
     OrderDTO entityToDTO(Order order);
 
-    List<OrderDTO> entitiesToDTOs(List<Order> orders);
+//    Page<OrderDTO> entitiesToDTOs(Page<Order> orders);
 
     @Mapping(target = "code", source = "code", ignore = true)
     Order updateEntityFromDTO(OrderDTO orderDTO, @MappingTarget Order order);

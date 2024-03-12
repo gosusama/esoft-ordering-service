@@ -38,18 +38,6 @@ public class UserServiceImpl implements UserService {
         return currentUser;
     }
 
-    public List<String> getCurrentUserRoles() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
-        if (authentication != null) {
-            return authentication.getAuthorities().stream()
-                    .map(GrantedAuthority::getAuthority)
-                    .collect(Collectors.toList());
-        }
-
-        return List.of(); // Empty list if authentication is not available
-    }
-
     @Override
     public Boolean isAdmin() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();

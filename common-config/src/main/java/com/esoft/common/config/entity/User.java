@@ -2,8 +2,6 @@ package com.esoft.common.config.entity;
 
 import jakarta.persistence.*;
 
-import java.util.List;
-
 @Entity
 @Table(name = "users")
 public class User {
@@ -20,9 +18,6 @@ public class User {
 
     @Column(name = "enabled", nullable = false)
     private int enabled;
-
-    @OneToMany(mappedBy = "createUser", cascade = CascadeType.ALL)
-    private List<Order> orders;
 
     public User() {
     }
@@ -63,13 +58,5 @@ public class User {
 
     public void setEnabled(int enabled) {
         this.enabled = enabled;
-    }
-
-    public List<Order> getOrders() {
-        return orders;
-    }
-
-    public void setOrders(List<Order> orders) {
-        this.orders = orders;
     }
 }

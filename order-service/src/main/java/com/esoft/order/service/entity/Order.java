@@ -1,5 +1,6 @@
-package com.esoft.common.config.entity;
+package com.esoft.order.service.entity;
 
+import com.esoft.common.config.entity.User;
 import jakarta.persistence.*;
 
 import java.math.BigDecimal;

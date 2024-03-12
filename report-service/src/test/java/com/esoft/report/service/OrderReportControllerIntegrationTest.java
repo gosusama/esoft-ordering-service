@@ -21,7 +21,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @TestPropertySource("/application-test.properties")
 @SpringBootTest
 @AutoConfigureMockMvc
-public class OrderReportControllerTest {
+public class OrderReportControllerIntegrationTest {
     @Autowired
     JdbcTemplate jdbc;
 
@@ -36,6 +36,9 @@ public class OrderReportControllerTest {
     @Value("${sql.scripts.create.authorities}")
     private String sqlAddAuthorities;
 
+    @Value("${sql.scripts.create.table.orders}")
+    private String sqlCreateTableOrders;
+
     @Value("${sql.scripts.create.orders}")
     private String sqlAddOrders;
 
@@ -45,14 +48,15 @@ public class OrderReportControllerTest {
     @Value("${sql.scripts.drop.table.authorities}")
     private String sqlDropTableAuthorities;
 
-    @Value("${sql.scripts.delete.orders}")
-    private String sqlDeleteOrders;
+    @Value("${sql.scripts.drop.table.orders}")
+    private String sqlDropTableOrders;
 
     @BeforeEach
     public void setupDatabase() {
         jdbc.execute(sqlAddUsers);
         jdbc.execute(sqlCreateTableAuthorities);
         jdbc.execute(sqlAddAuthorities);
+        jdbc.execute(sqlCreateTableOrders);
         jdbc.execute(sqlAddOrders);
     }
 
@@ -129,7 +133,7 @@ public class OrderReportControllerTest {
 
     @Test
     public void getOrdersAndRevenueSummaryHttpRequest() throws Exception {
-        mockMvc.perform(get("/api/reports/orders/summary/orders-revenue?year=2024&month=2")
+        mockMvc.perform(get("/api/reports/orders/summary/orders-revenue?year=2024&month=3")
                         .with(httpBasic("admin", "admin")))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.totalOrders", is(6)))
@@ -176,7 +180,7 @@ public class OrderReportControllerTest {
 
     @AfterEach
     public void setupAfterTransaction() {
-        jdbc.execute(sqlDeleteOrders);
+        jdbc.execute(sqlDropTableOrders);
         jdbc.execute(sqlDropTableAuthorities);
         jdbc.execute(sqlDeleteUsers);
     }

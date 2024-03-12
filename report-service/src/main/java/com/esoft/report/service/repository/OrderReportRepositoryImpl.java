@@ -2,7 +2,7 @@ package com.esoft.report.service.repository;
 
 import com.esoft.report.service.dto.OrderSummaryReportDTO;
 import jakarta.persistence.EntityManager;
-import jakarta.persistence.TypedQuery;
+import jakarta.persistence.Query;
 import org.springframework.stereotype.Repository;
 
 import java.math.BigDecimal;
@@ -17,53 +17,63 @@ public class OrderReportRepositoryImpl implements OrderReportRepository {
 
     @Override
     public Long countByCreateUserId(int uid) {
-        TypedQuery<Long> query = entityManager.createQuery(
-                "SELECT COUNT(*) FROM Order WHERE createUser.id = :uid", Long.class
+        Query query = entityManager.createNativeQuery(
+                "SELECT COUNT(*) FROM orders WHERE create_uid = :uid"
         );
         query.setParameter("uid", uid);
 
-        return query.getSingleResult();
+        return (Long) query.getSingleResult();
     }
 
     @Override
     public BigDecimal sumAmountByUserId(int uid) {
-        TypedQuery<BigDecimal> query = entityManager.createQuery(
-                "SELECT SUM(amount) FROM Order WHERE createUser.id = :uid", BigDecimal.class
+        Query query = entityManager.createNativeQuery(
+                "SELECT SUM(amount) FROM orders WHERE create_uid = :uid"
         );
         query.setParameter("uid", uid);
 
-        return query.getSingleResult();
+        return (BigDecimal) query.getSingleResult();
     }
 
     @Override
     public OrderSummaryReportDTO findCountOrdersAndSumAmountByUid(int uid) {
         String sql = "SELECT COUNT(*) as totalOrders, SUM(amount) as totalOrderValue " +
-                "FROM Order " +
-                "WHERE createUser.id = :uid";
+                "FROM orders " +
+                "WHERE create_uid = :uid";
 
-        TypedQuery<OrderSummaryReportDTO> query = entityManager.createQuery(sql, OrderSummaryReportDTO.class);
+        Query query = entityManager.createNativeQuery(sql);
 
         query.setParameter("uid", uid);
 
-        return query.getSingleResult();
+        Object[] result = (Object[]) query.getSingleResult();
+        if (result != null) {
+            return new OrderSummaryReportDTO(((Number) result[0]).longValue(), (BigDecimal) result[1]);
+        } else {
+            return new OrderSummaryReportDTO(0L, new BigDecimal(0));
+        }
     }
 
     @Override
     public OrderSummaryReportDTO findCountOrdersAndSumAmount(Integer year, Integer month) {
         String sql = "SELECT COUNT(*) as totalOrders, SUM(amount) as totalOrderValue " +
-                "FROM Order " +
-                "WHERE YEAR(createDate) = :year";
+                "FROM orders " +
+                "WHERE YEAR(create_date) = :year";
         if (month != null) {
-            sql += " AND MONTH(createDate) = :month";
+            sql += " AND MONTH(create_date) = :month";
         }
 
-        TypedQuery<OrderSummaryReportDTO> query = entityManager.createQuery(sql, OrderSummaryReportDTO.class);
+        Query query = entityManager.createNativeQuery(sql);
 
         query.setParameter("year", year);
         if (month != null) {
             query.setParameter("month", month);
         }
 
-        return query.getSingleResult();
+        Object[] result = (Object[]) query.getSingleResult();
+        if (result != null) {
+            return new OrderSummaryReportDTO(((Number) result[0]).longValue(), (BigDecimal) result[1]);
+        } else {
+            return new OrderSummaryReportDTO(0L, new BigDecimal(0));
+        }
     }
 }

@@ -1,41 +1,41 @@
 package com.esoft.order.service.service;
 
-import com.esoft.common.config.entity.Order;
-import com.esoft.common.config.entity.User;
-import com.esoft.common.config.service.UserService;
+import com.esoft.common.config.response.OrderNotFoundException;
+import com.esoft.order.service.entity.Order;
 import com.esoft.order.service.repository.OrderRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Optional;
+import java.util.logging.Logger;
 
 @Service
 public class OrderServiceImpl implements OrderService {
+    private final Logger logger = Logger.getLogger(getClass().getName());
+
     private final OrderRepository orderRepository;
 
-    private final UserService userService;
-
-    public OrderServiceImpl(OrderRepository orderRepository, UserService userService) {
+    public OrderServiceImpl(OrderRepository orderRepository) {
         this.orderRepository = orderRepository;
-        this.userService = userService;
     }
 
     @Override
     public Order findById(int id) {
         Optional<Order> result = orderRepository.findById(id);
 
-        Order order = null;
         if (result.isPresent()) {
-            order = result.get();
+           return result.get();
+        } else {
+            logger.warning("Order id not found - " + id);
+            throw new OrderNotFoundException("Order id not found - " + id);
         }
-
-        return order;
     }
 
     @Override
-    public List<Order> findByUid(int uid) {
-        return orderRepository.findByCreateUserId(uid);
+    public Page<Order> findByUid(int uid, Pageable pageable) {
+        return orderRepository.findByCreateUserId(uid, pageable);
     }
 
     @Override

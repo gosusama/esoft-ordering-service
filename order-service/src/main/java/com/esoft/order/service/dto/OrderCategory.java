@@ -1,4 +1,4 @@
-package com.esoft.common.config.dto;
+package com.esoft.order.service.dto;
 
 public enum OrderCategory {
     LUXURY,

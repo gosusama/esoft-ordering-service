@@ -53,4 +53,14 @@ public class ApiResponse<T> {
     public void setTimeStamp(long timeStamp) {
         this.timeStamp = timeStamp;
     }
+
+    @Override
+    public String toString() {
+        return "ApiResponse{" +
+                "status='" + status + '\'' +
+                ", message='" + message + '\'' +
+                ", data=" + data +
+                ", timeStamp=" + timeStamp +
+                '}';
+    }
 }

@@ -35,7 +35,17 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(401).body(error);
     }
 
-    // Exception handler ... to catch any exception (catch all)
+    // handle exception when order not found
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ResponseEntity<ApiResponse> handleException(OrderNotFoundException ex) {
+        ApiResponse error = new ApiResponse("error", ex.getMessage());
+
+        // return ResponseEntity
+        return ResponseEntity.badRequest().body(error);
+    }
+
+    // handle other exception
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ResponseEntity<ApiResponse> handleException(Exception ex) {

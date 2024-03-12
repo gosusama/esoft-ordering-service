@@ -1,7 +1,6 @@
-package com.esoft.common.config.dto;
+package com.esoft.order.service.dto;
 
-
-import com.esoft.common.config.validation.OrderEnumValidValue;
+import com.esoft.order.service.validation.OrderEnumValidValue;
 import jakarta.validation.constraints.Min;
 
 import java.math.BigDecimal;
@@ -99,5 +98,19 @@ public class OrderDTO {
 
     public void setNote(String note) {
         this.note = note;
+    }
+
+    @Override
+    public String toString() {
+        return "OrderDTO{" +
+                "id=" + id +
+                ", code='" + code + '\'' +
+                ", category='" + category + '\'' +
+                ", quantity=" + quantity +
+                ", serviceName='" + serviceName + '\'' +
+                ", amount=" + amount +
+                ", description='" + description + '\'' +
+                ", note='" + note + '\'' +
+                '}';
     }
 }

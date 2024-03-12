@@ -1,23 +1,28 @@
 package com.esoft.order.service.controller;
 
-import com.esoft.common.config.dto.OrderDTO;
-import com.esoft.common.config.entity.Order;
+import com.esoft.order.service.dto.OrderDTO;
+import com.esoft.order.service.entity.Order;
 import com.esoft.common.config.entity.User;
 import com.esoft.common.config.response.ApiResponse;
-import com.esoft.common.config.mapper.OrderMapper;
 import com.esoft.common.config.service.UserService;
+import com.esoft.order.service.mapper.OrderMapper;
 import com.esoft.order.service.service.OrderService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.naming.NoPermissionException;
-import java.util.List;
+import java.util.logging.Logger;
 
 @RestController
 @RequestMapping("/api")
 public class OrderController {
+    private final Logger logger = Logger.getLogger(getClass().getName());
+
     private final OrderService orderService;
 
     private final UserService userService;
@@ -35,34 +40,35 @@ public class OrderController {
     public ResponseEntity<ApiResponse<OrderDTO>> getOrder(@PathVariable int id) throws NoPermissionException {
         Order order = orderService.findById(id);
 
-        if (order == null) {
-            throw new RuntimeException("Order id not found - " + id);
-        }
-
         // Just admin or created user can see the order
         if (!userService.isAdmin()) {
             checkPermissionWithOrder(order);
         }
 
         ApiResponse<OrderDTO> response = new ApiResponse<>("success",
-                orderMapper.entityToDTO(orderService.save(order)));
+                orderMapper.entityToDTO(order));
 
         return ResponseEntity.ok(response);
     }
 
     @GetMapping("/orders/users/{uid}")
-    public ResponseEntity<ApiResponse<List<OrderDTO>>> getOrdersByUid(@PathVariable int uid) throws NoPermissionException {
+    public ResponseEntity<ApiResponse<Page<OrderDTO>>> getOrdersByUid(
+            @PathVariable int uid,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) throws NoPermissionException {
         User currentUser = userService.getCurrentUser();
 
         // Just admin or created user can see the orders
         if (currentUser.getId() != uid && !userService.isAdmin()) {
+            logger.warning("User " + currentUser.getUsername() +
+                    " does not have permission to operate on orders of user id - " + uid);
             throw new NoPermissionException("User " + currentUser.getUsername() +
                     " does not have permission to perform the operation.");
         }
 
-        ApiResponse<List<OrderDTO>> response = new ApiResponse<>("success",
-                orderMapper.entitiesToDTOs(orderService.findByUid(uid)));
-
+        Pageable pageable = PageRequest.of(page, size);
+        ApiResponse<Page<OrderDTO>> response = new ApiResponse<>("success",
+                orderService.findByUid(uid, pageable).map(orderMapper::entityToDTO));
 
         return ResponseEntity.ok(response);
     }
@@ -101,11 +107,6 @@ public class OrderController {
     public ResponseEntity<ApiResponse<String>> deleteOrder(@PathVariable int id) throws NoPermissionException {
         Order tempOrder = orderService.findById(id);
 
-        // throw exception if null
-        if (tempOrder == null) {
-            throw new RuntimeException("Order id not found - " + id);
-        }
-
         // Just created user can delete the order
         checkPermissionWithOrder(tempOrder);
 
@@ -119,6 +120,8 @@ public class OrderController {
     public void checkPermissionWithOrder(Order order) throws NoPermissionException {
         User currentUser = userService.getCurrentUser();
         if (currentUser.getId() != order.getCreateUser().getId()) {
+            logger.warning("User " + currentUser.getUsername() +
+                    " does not have permission to operate on order id - " + order.getId());
             throw new NoPermissionException("User " + currentUser.getUsername() +
                     " does not have permission to perform the operation.");
         }

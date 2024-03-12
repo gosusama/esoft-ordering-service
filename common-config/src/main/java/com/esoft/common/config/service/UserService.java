@@ -7,7 +7,5 @@ import java.util.List;
 public interface UserService {
     User getCurrentUser();
 
-    List<String> getCurrentUserRoles();
-
     Boolean isAdmin();
 }

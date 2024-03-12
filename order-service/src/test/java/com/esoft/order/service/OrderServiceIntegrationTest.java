@@ -1,6 +1,7 @@
 package com.esoft.order.service;
 
-import com.esoft.common.config.entity.Order;
+import com.esoft.common.config.response.OrderNotFoundException;
+import com.esoft.order.service.entity.Order;
 import com.esoft.common.config.entity.User;
 import com.esoft.common.config.repository.UserRepository;
 import com.esoft.order.service.service.OrderService;
@@ -20,7 +21,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @TestPropertySource("/application-test.properties")
 @SpringBootTest
-public class OrderServiceTest {
+public class OrderServiceIntegrationTest {
     @Autowired
     JdbcTemplate jdbc;
 
@@ -49,20 +50,22 @@ public class OrderServiceTest {
     }
 
     @Test
-    public void findByIdService() {
+    public void findByIdServiceTest() {
         Order order = orderService.findById(2);
 
         assertEquals("1708867969268_2", order.getCode());
     }
 
     @Test
-    public void findByNotExistIdService() {
-        assertNull(orderService.findById(200));
+    public void findByNotExistIdServiceTest() {
+        assertThrows(OrderNotFoundException.class, () -> {
+            orderService.findById(200);
+        });
     }
 
     @Test
     @Transactional
-    public void createOrderService() {
+    public void createOrderServiceTest() {
         User user = userRepository.findByUsername("customer");
         Order order = new Order("LUXURY", 1, "PHOTO_EDITING", new BigDecimal("113.13"));
         order.setDescription("Resize");
@@ -81,7 +84,7 @@ public class OrderServiceTest {
     }
 
     @Test
-    public void updateOrderService() {
+    public void updateOrderServiceTest() {
         assertDoesNotThrow(() -> {
             orderService.findById(2);
         });
@@ -113,12 +116,17 @@ public class OrderServiceTest {
     }
 
     @Test
-    public void deleteByIdService() {
+    public void deleteByIdServiceTest() {
+        assertDoesNotThrow(() -> {
+            orderService.findById(2);
+        });
         assertNotNull(orderService.findById(2));
 
         orderService.deleteById(2);
 
-        assertNull(orderService.findById(2));
+        assertThrows(OrderNotFoundException.class, () -> {
+            orderService.findById(2);
+        });
     }
 
     @AfterEach
