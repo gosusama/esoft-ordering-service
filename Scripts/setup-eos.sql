@@ -60,6 +60,7 @@ CREATE TABLE `orders` (
   `write_date` datetime,
   PRIMARY KEY (`id`),
   KEY `fk_users_idx` (`create_uid`),
+  KEY `idx_create_date` (`create_date`),
   CONSTRAINT `fk_users` FOREIGN KEY (`create_uid`) REFERENCES `users` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=latin1;
 
